@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# 受限/课程专用数据：不要上传 GitHub（课程要求）。
+# 在 README 中说明如何获取原始数据，并把文件放到 Data/raw/ 下，
+# 运行 pipeline 会自动重新生成 Data/processed/ 和 Output/。
+Data/raw/
+Data/processed/
+
+# 本地配置
+.env
