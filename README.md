@@ -38,9 +38,9 @@ and a border-subsample robustness check. See `Output/table/extension_*.csv` and
 ## Repository structure
 
 ```
-├── run_all.py               # one-command workflow (regenerates everything)
 ├── requirements.txt         # Python dependencies
 ├── Code/
+│   ├── run_all.py           # one-command workflow (regenerates everything)
 │   ├── 01_clean.py          # data cleaning: FTE, samples -> Data/processed/
 │   ├── 02_descriptives.py   # Table 2, Table 3, Figure 1
 │   ├── 03_did.py            # Table 4 (DiD regressions) + wage first stage
@@ -80,7 +80,7 @@ pip install -r requirements.txt
 # 2. put Data/raw/public.csv in place (see above)
 
 # 3. run the whole pipeline
-python run_all.py
+python Code/run_all.py
 ```
 
 The workflow runs `01_clean.py → 02_descriptives.py → 03_did.py → 04_extension.py`

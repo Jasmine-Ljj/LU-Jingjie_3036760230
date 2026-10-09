@@ -140,22 +140,22 @@ def main() -> None:
     # --- Part 1: ownership heterogeneity in the employment response ---
     t_emp = ownership_table(emp, "d_fte", "dFTE")
     t_emp.to_csv(TBL_DIR / "extension_ownership_ddd.csv", index=False)
-    print_ddd(t_emp, "扩展1：直营 vs 加盟 的就业反应差异 (DDD)")
+    print_ddd(t_emp, "Extension 1: employment response by ownership type (DDD)")
 
     # --- Part 2: compliance (wage first stage) by ownership ---
     t_wage = ownership_table(wage, "d_wage", "dStarting wage")
     t_wage.to_csv(TBL_DIR / "extension_ownership_wage.csv", index=False)
-    print_ddd(t_wage, "验证：最低工资对起薪的冲击是否因企业类型而异")
+    print_ddd(t_wage, "Validation: did the minimum wage bite differently by ownership type?")
 
     # --- Part 3: border-subsample robustness (NJ vs PA1 only) ---
     border = emp[(emp["STATE"] == 1) | (emp["PA1"] == 1)].copy()
-    print(f"\n=== 扩展2：边界子样本稳健性 (NJ vs PA1, n={len(border)}) ===")
+    print(f"\n=== Extension 2: border-subsample robustness (NJ vs PA1, n={len(border)}) ===")
     base = smf.ols("d_fte ~ STATE", data=border).fit()
     print(f"  主 DiD (ΔFTE ~ NJ): {base.params['STATE']:.3f}  (SE {base.bse['STATE']:.3f}, "
           f"t = {base.params['STATE']/base.bse['STATE']:.2f})")
     t_border = ownership_table(border, "d_fte", "dFTE")
     t_border.to_csv(TBL_DIR / "extension_border_robustness.csv", index=False)
-    print_ddd(t_border, "边界样本下的 DDD")
+    print_ddd(t_border, "DDD on the border sample")
 
     fig = coefficient_plot(t_emp, t_border, FIG_DIR / "extension_ownership_did.png")
     print(f"\nWrote figure: {fig}")

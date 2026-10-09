@@ -12,7 +12,7 @@ Princeton Card–Krueger public replication data). Nothing else is needed.
 
 ```bash
 pip install -r requirements.txt
-python run_all.py
+python Code/run_all.py
 ```
 
 ## Pipeline
