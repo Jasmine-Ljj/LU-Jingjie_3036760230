@@ -1,6 +1,6 @@
-model,treatment,coef,se,tstat,nobs
-(i) NJ dummy,STATE,2.359,1.146,2.059,365
-(ii) NJ dummy + chain & ownership,STATE,2.327,1.151,2.022,365
-(iii) wage GAP,GAP,15.891,5.952,2.67,365
-(iv) wage GAP + chain & ownership,GAP,15.194,6.083,2.498,365
-(v) wage GAP + chain & ownership + region,GAP,12.028,7.323,1.643,365
+model,coef,se,tstat,nobs,se_regression,p_controls
+(i) NJ dummy,2.359,1.146,2.059,365,8.71,
+(ii) NJ dummy + chain & ownership,2.327,1.151,2.022,365,8.699,0.299
+(iii) wage GAP,15.891,5.952,2.67,365,8.676,
+(iv) wage GAP + chain & ownership,15.194,6.083,2.498,365,8.674,0.381
+(v) wage GAP + chain & ownership + region,12.028,7.323,1.643,365,8.668,0.375

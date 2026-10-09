@@ -17,12 +17,12 @@ python Code/run_all.py
 
 ## Pipeline
 
-| Step | Script | Produces |
+| Step | Where | Produces |
 |---|---|---|
 | 1. Clean | `Code/01_clean.py` | `Data/processed/ck_wide.csv`, `ck_long.csv` |
-| 2. Descriptives | `Code/02_descriptives.py` | Table 2, Table 3, Figure 1 |
-| 3. DiD | `Code/03_did.py` | Table 4 (5 models), wage first stage |
-| 4. Extension | `Code/04_extension.py` | ownership DDD, border robustness, figure |
+| 2. Descriptives | `Code/run_all.py` | Table 2, Table 3, Figure 1 |
+| 3. DiD | `Code/run_all.py` | Table 4 (5 models), wage first stage |
+| 4. Extension | `Code/run_all.py` | ownership DDD, border robustness, figure |
 
 ## Key definitions (do not change without updating the report)
 
@@ -37,4 +37,5 @@ python Code/run_all.py
 To adapt this workflow to another two-period DiD dataset, keep the same pipeline
 shape: (1) clean → construct outcome + treatment + sample; (2) describe → means and
 distribution; (3) estimate → first-difference DiD with a dose/continuous treatment;
-(4) extend → heterogeneity + robustness. Replace the variable names in each script.
+(4) extend → heterogeneity + robustness. Replace the variable names in
+`01_clean.py` and `run_all.py`.
