@@ -1,0 +1,3 @@
+franchised_did,co_owned_did,heterogeneity,nobs,spec,outcome
+"(np.float64(3.1317951061021296), np.float64(1.4315728117195183))","(np.float64(2.036502849002846), np.float64(1.9628782083776743))","(np.float64(-1.0952922570992838), np.float64(2.4294632279947126))",384,DDD,dFTE
+"(np.float64(3.1811932981373454), np.float64(1.4384518148914875))","(np.float64(2.039518963757359), np.float64(1.9793787486243763))","(np.float64(-1.1416743343799864), np.float64(2.4611613842605866))",384,DDD + chain controls,dFTE
