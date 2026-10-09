@@ -1,52 +1,110 @@
-# Card & Krueger (1994) — Minimum Wages and Employment: Replication + Extension
+# Replication of Card & Krueger (1994) — Minimum Wages and Employment in the Fast-Food Industry
 
-An end-to-end, reproducible Python replication of
+A reproducible, end-to-end Python replication of
 
 > David Card and Alan B. Krueger (1994), "Minimum Wages and Employment: A Case
 > Study of the Fast-Food Industry in New Jersey and Pennsylvania," *American
 > Economic Review* 84(4), 772–793.
 
-plus one independent extension.
+## 1. Introduction to this replication
 
-## Research question and design
+**Research question.** On April 1, 1992, New Jersey (NJ) raised its state minimum
+wage from $4.25 to $5.05 per hour, while neighbouring eastern Pennsylvania (PA)
+remained at the federal $4.25. Card and Krueger surveyed 410 fast-food
+restaurants (Burger King, KFC, Roy Rogers, Wendy's) in NJ and eastern PA before
+(Feb–Mar 1992) and after (Nov–Dec 1992) the increase, and used a
+**difference-in-differences (DiD)** design to ask whether the minimum wage reduced
+employment.
 
-On April 1, 1992, New Jersey raised its minimum wage from \$4.25 to \$5.05, while
-neighbouring eastern Pennsylvania stayed at \$4.25. Card and Krueger survey 410
-fast-food restaurants (Burger King, KFC, Roy Rogers, Wendy's) in New Jersey (NJ)
-and eastern Pennsylvania (PA) before (Feb–Mar 1992) and after (Nov–Dec 1992) the
-increase, and use a **difference-in-differences (DiD)** design to ask whether the
-minimum wage reduced employment.
+**What this project reproduces.** Tables 2–4 and Figure 1 of the paper, plus one
+independent extension — whether the employment response differs between
+company-owned and franchised restaurants. The headline result is reproduced:
+employment did not fall; the DiD estimate is ≈ +2.75 full-time-equivalent (FTE)
+workers per store.
 
-The headline result — **no negative employment effect; NJ employment actually rose
-relative to PA** — is reproduced here (DiD ≈ +2.75 full-time-equivalent workers).
+## 2. The replication process
 
-## What is reproduced
+The workflow is a four-step pipeline. Each step is one script in `Code/`, and
+`Code/run_all.py` runs them in order, so a single command regenerates everything.
 
-| Original | This repo |
-|---|---|
-| Table 2 (store characteristics & means) | `Output/table/table2_panelA_store_types.csv`, `table2_means.csv` |
-| Table 3 (mean FTE before/after + DiD) | `Output/table/table3_did.csv` |
-| Table 4 (DiD regressions, 5 models) | `Output/table/table4_did.csv` |
-| Figure 1 (distribution of employment change) | `Output/figure/figure1.png` |
+| Step | Script | What it does | Output |
+|---|---|---|---|
+| 1. Clean | `Code/01_clean.py` | reads the raw survey, constructs FTE and change variables, defines the analysis sample | `Data/processed/ck_wide.csv`, `ck_long.csv` |
+| 2. Descriptives | `Code/02_descriptives.py` | reproduces Table 2 (store types & means), Table 3 (mean FTE + DiD), Figure 1 | `Output/table/table2_*`, `table3_did.csv`, `Output/figure/figure1.png` |
+| 3. DiD | `Code/03_did.py` | reproduces Table 4 (five DiD models) and the wage first stage | `Output/table/table4_did.csv`, `first_stage.csv` |
+| 4. Extension | `Code/04_extension.py` | ownership-heterogeneity DDD + wage first stage + border robustness | `Output/table/extension_*`, `Output/figure/extension_ownership_did.png` |
 
-**Independent extension** — *heterogeneity by ownership type*: does the employment
-response differ between company-owned and franchised restaurants? Implemented as a
-difference-in-difference-in-differences (DDD) with a wage "first-stage" validation
-and a border-subsample robustness check. See `Output/table/extension_*.csv` and
-`Output/figure/extension_ownership_did.png`.
+## 3. How to reproduce the results
 
-## Repository structure
+Run every command below from the repository root.
+
+### 3.1 Install dependencies
+
+Requires Python 3.9+ and the four packages in `requirements.txt`:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3.2 Put the data in place
+
+The raw survey file `public.csv` is course-restricted and is **not** committed to
+this repository. Obtain it from the course data package (Package 01), then place
+it at exactly:
 
 ```
-├── requirements.txt         # Python dependencies
+Data/raw/public.csv
+```
+
+Expected shape: 410 rows (one per restaurant) × 46 columns.
+
+### 3.3 Run the workflow
+
+One command regenerates every table and figure:
+
+```bash
+python Code/run_all.py
+```
+
+`run_all.py` runs steps 1–4 above, then prints an output check listing all 12
+expected files with `[OK]`/`[MISS]`. If anything is missing it exits with an
+error, so a clean run is itself the feasibility check.
+
+### 3.4 Verify the key numbers
+
+After a clean run, the key results should match the original paper:
+
+| Check | Expected |
+|---|---|
+| Table 3 — DiD on FTE | **+2.75** |
+| Table 4 (i) — NJ dummy | ≈ +2.36 (SE 1.15) |
+| Table 4 (iii) — wage GAP | ≈ +15.89 (SE 5.95) |
+| Wage first stage | ≈ +0.50 (t ≈ 10.7) |
+
+Minor differences from the published numbers (e.g. 365 vs 357 stores in Table 4)
+reflect the public replication file vs the original survey, and are documented in
+the report.
+
+## 4. Key variable definitions
+
+- **FTE (full-time-equivalent employment)** = full-time + managers + 0.5 × part-time.
+- **Treatment** `STATE = 1` for New Jersey, `0` for Pennsylvania.
+- **Main sample** = restaurants with valid FTE in both waves, including stores
+  that closed between waves (second-wave employment recorded as 0).
+- **GAP** (Table 4) = `max(0, (5.05 − WAGE_ST) / WAGE_ST)` for NJ stores, 0 otherwise.
+
+## 5. Repository structure
+
+```
+├── requirements.txt
 ├── Code/
-│   ├── run_all.py           # one-command workflow (regenerates everything)
-│   ├── 01_clean.py          # data cleaning: FTE, samples -> Data/processed/
+│   ├── run_all.py           # single entry point — regenerates everything
+│   ├── 01_clean.py          # data cleaning
 │   ├── 02_descriptives.py   # Table 2, Table 3, Figure 1
-│   ├── 03_did.py            # Table 4 (DiD regressions) + wage first stage
+│   ├── 03_did.py            # Table 4 + wage first stage
 │   └── 04_extension.py      # ownership-heterogeneity extension
 ├── Data/
-│   ├── raw/                 # PUT public.csv HERE (not committed, see below)
+│   ├── raw/                 # PUT public.csv HERE (not committed)
 │   └── processed/           # generated by 01_clean.py (not committed)
 ├── Output/
 │   ├── table/               # generated tables (.csv)
@@ -55,78 +113,8 @@ and a border-subsample robustness check. See `Output/table/extension_*.csv` and
     └── SKILL.md             # workflow documentation
 ```
 
-## Data (important — restricted input)
+## 6. Reusable skill
 
-The raw survey data (`public.csv`) is **not included** in this repository because
-it is provided for coursework only and must not be redistributed or uploaded to a
-public repository.
-
-To reproduce the results:
-
-1. Obtain `public.csv` from the course data package (Package 01), or from the
-   public Card–Krueger replication files distributed by Princeton/ISER.
-2. Place it at **`Data/raw/public.csv`** (keep the filename and folder exactly).
-3. Run the workflow below — no other manual steps are required.
-
-Expected file: 410 rows (one per restaurant), 46 columns (`SHEET`, `CHAIN`, …,
-`EMPFT`, `EMPPT`, `NMGRS`, `WAGE_ST`, …, `EMPFT2`, …, `NREGS112`).
-
-## Reproducing the results
-
-```bash
-# 1. install dependencies (Python 3.9+)
-pip install -r requirements.txt
-
-# 2. put Data/raw/public.csv in place (see above)
-
-# 3. run the whole pipeline
-python Code/run_all.py
-```
-
-The workflow runs `01_clean.py → 02_descriptives.py → 03_did.py → 04_extension.py`
-and writes all tables to `Output/table/` and figures to `Output/figure/`.
-
-### Variable definitions
-
-- **FTE (full-time-equivalent employment)** = full-time employees + managers +
-  0.5 × part-time employees.
-- **Treatment** `STATE = 1` for New Jersey, `0` for Pennsylvania.
-- **Main sample**: restaurants with valid FTE in both waves, including those that
-  closed between waves (second-wave employment recorded as 0).
-- **GAP** (Table 4): the proportional wage increase needed to reach the new \$5.05
-  minimum, `GAP = max(0, (5.05 − WAGE_ST)/WAGE_ST)` for NJ stores, 0 otherwise.
-
-## Results vs. the original paper
-
-| Result | Reproduced | Original |
-|---|---|---|
-| Table 3 — DiD on FTE | **+2.75** | +2.75 |
-| Table 4 (i) — NJ dummy | **+2.36** (SE 1.15) | +2.33 (SE 1.19) |
-| Table 4 (iii) — wage GAP | **+15.89** (SE 5.95) | +15.65 (SE 6.08) |
-| Wage first stage | **+0.50** (t ≈ 10.7) | ≈ +0.47 |
-
-Minor differences (e.g., 365 vs. 357 stores in Table 4) reflect the public
-replication file vs. the original survey data, and are documented in the report.
-Standard errors follow the paper's convention (ordinary OLS SEs).
-
-### Extension findings
-
-- Franchised stores: DiD ≈ +3.13; company-owned: ≈ +2.04; difference ≈ −1.10
-  (not significant). The positive employment effect is **broad-based** and does not
-  differ significantly by ownership type.
-- The wage first stage is nearly identical across ownership types (≈ +0.47 to
-  +0.55), so the comparison is valid.
-- Restricting the control group to the Philadelphia suburbs (PA1) strengthens the
-  result (DiD ≈ +4.33, t ≈ 2.8).
-
-## AI-use disclosure
-
-AI assistance was used throughout for code scaffolding, debugging, and drafting.
-Every data choice, sample definition, and result was checked against the original
-paper. See the empirical report for the full disclosure.
-
-## Notes
-
-- Git history tracks meaningful milestones (cleaning → descriptives → DiD →
-  extension).
-- For ECO6067 teaching and coursework only. Do not redistribute the data.
+This workflow is packaged as a reusable skill — see `Skill/SKILL.md`. The same
+four-step shape (clean → describe → estimate DiD → extend) transfers to any
+two-period DiD dataset: keep the scripts and swap the variable names.
