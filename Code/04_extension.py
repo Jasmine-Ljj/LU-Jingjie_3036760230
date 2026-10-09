@@ -64,9 +64,12 @@ def ddd(df: pd.DataFrame, y: str, chain_controls: bool) -> dict:
 
     co_owned_did = b_state + b_inter
     return {
-        "franchised_did": (b_state, se("STATE")),
-        "co_owned_did": (co_owned_did, se("STATE", "STATE:CO_OWNED")),
-        "heterogeneity": (b_inter, se("STATE:CO_OWNED")),
+        "franchised_coef": float(b_state),
+        "franchised_se": float(se("STATE")),
+        "co_owned_coef": float(co_owned_did),
+        "co_owned_se": float(se("STATE", "STATE:CO_OWNED")),
+        "heterogeneity_coef": float(b_inter),
+        "heterogeneity_se": float(se("STATE:CO_OWNED")),
         "nobs": int(res.nobs),
     }
 
@@ -83,11 +86,13 @@ def ownership_table(df: pd.DataFrame, y: str, ylabel: str) -> pd.DataFrame:
 def print_ddd(df: pd.DataFrame, title: str) -> None:
     print(f"\n=== {title} ===")
     for _, r in df.iterrows():
-        fd, cd, h = r["franchised_did"], r["co_owned_did"], r["heterogeneity"]
+        fc, fs = r["franchised_coef"], r["franchised_se"]
+        cc, cs = r["co_owned_coef"], r["co_owned_se"]
+        hc, hs = r["heterogeneity_coef"], r["heterogeneity_se"]
         print(f"  {r['spec']:22s} ({r['outcome']})")
-        print(f"    franchised DiD    = {fd[0]:6.3f}  (SE {fd[1]:.3f}, t = {fd[0]/fd[1]:5.2f})")
-        print(f"    company-owned DiD = {cd[0]:6.3f}  (SE {cd[1]:.3f}, t = {cd[0]/cd[1]:5.2f})")
-        print(f"    heterogeneity (b) = {h[0]:6.3f}  (SE {h[1]:.3f}, t = {h[0]/h[1]:5.2f})")
+        print(f"    franchised DiD    = {fc:6.3f}  (SE {fs:.3f}, t = {fc/fs:5.2f})")
+        print(f"    company-owned DiD = {cc:6.3f}  (SE {cs:.3f}, t = {cc/cs:5.2f})")
+        print(f"    heterogeneity (b) = {hc:6.3f}  (SE {hs:.3f}, t = {hc/hs:5.2f})")
 
 
 def coefficient_plot(full, border, out: Path) -> Path:
@@ -95,8 +100,8 @@ def coefficient_plot(full, border, out: Path) -> Path:
     def estimates(tbl):
         row = tbl[tbl["spec"] == "DDD"].iloc[0]
         return {
-            "Franchised": row["franchised_did"],
-            "Company-owned": row["co_owned_did"],
+            "Franchised": (row["franchised_coef"], row["franchised_se"]),
+            "Company-owned": (row["co_owned_coef"], row["co_owned_se"]),
         }
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), sharex=True)
