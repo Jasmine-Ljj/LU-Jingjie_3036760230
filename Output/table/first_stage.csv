@@ -1,0 +1,2 @@
+model,coef,se,tstat,nobs
+d_wage ~ NJ dummy,0.497,0.047,10.654,370
